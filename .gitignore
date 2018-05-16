@@ -23,10 +23,10 @@
 hs_err_pid*
 
 # Maven
-/target
+target/
 
 # Eclipse
 .project
 .classpath
 *.prefs
-.settings
+.settings/
