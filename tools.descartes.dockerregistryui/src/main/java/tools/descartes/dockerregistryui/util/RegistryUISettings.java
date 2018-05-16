@@ -24,6 +24,14 @@ public class RegistryUISettings {
 	private static final String FALLBACK_REGISTRY_PROTOCOL = "https";
 	private static final String FALLBACK_CONTEXT = "/ui";
 	
+	/**
+	 * Public constants.
+	 */
+	public static final String GREETING_FILE = "greeting.wikitext";
+	
+	// This path is identical to the path specified in the persistence.xml 
+	public static final String VOLUME_PATH = "/var/lib/dockerregistryui/";
+	
 	public static final RegistryUISettings SETTINGS = new RegistryUISettings();
 	
 	private String registryHost = FALLBACK_REGISTRY_HOST;

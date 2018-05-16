@@ -16,6 +16,8 @@
 package tools.descartes.dockerregistryui;
 
 
+import java.io.File;
+
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.servlet.ServletHandler;
@@ -23,6 +25,7 @@ import org.eclipse.jetty.webapp.Configuration;
 import org.eclipse.jetty.webapp.WebAppContext;
 
 import tools.descartes.dockerregistryui.util.RegistryUISettings;
+import tools.descartes.dockerregistryui.util.WikiParser;
 
 public class Launcher {
 
@@ -64,7 +67,8 @@ public class Launcher {
 		webapp.addServlet(ManagerUIServlet.class, "");
 		webapp.addServlet(RemoveCategoryFromImageServlet.class, "/removecategoryfromimage");
 		webapp.addServlet(RemoveCategoryServlet.class, "/removecategory");
-		
+		//Reads the wikifile on startup and renders the greeting
+		webapp.getServletContext().setAttribute("greeting", WikiParser.wikiMarkupToHTML(new File(RegistryUISettings.VOLUME_PATH + RegistryUISettings.GREETING_FILE)));
 		//Redirection servlet, redirects root calls to the webapp.
 		ServletHandler rootRedirectHandler = new ServletHandler();
 		rootRedirectHandler.addServletWithMapping(RootRedirectServlet.class, "");

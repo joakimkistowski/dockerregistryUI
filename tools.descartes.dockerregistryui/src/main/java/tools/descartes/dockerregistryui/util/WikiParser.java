@@ -36,7 +36,9 @@ public class WikiParser {
 				lineBuffer.append(line);
 			}
 		} catch (IOException e) {
-			return null;
+			System.out.println("WARN: IOException reading file at " + markupFile.getAbsolutePath());
+			System.out.println("\tThis is expected behavior if no markup file was provided.");
+			return "";
 		}
 		return wikiMarkupToHTML(lineBuffer.toString());
 	}
@@ -93,5 +95,4 @@ public class WikiParser {
 		}
 		
 	}
-	
 }
