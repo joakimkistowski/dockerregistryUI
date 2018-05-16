@@ -1,0 +1,101 @@
+package tools.descartes.dockerregistryui.persistence;
+
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+/**
+ * Transient Class for holding image information from both the registry and the database.
+ * @author Joakim von Kistowski
+ *
+ */
+public class ImageInfoContainer {
+
+	private static final Pattern LINK_PATTERN = Pattern.compile("(^|\\s)(?<link>https??://\\S+)($|\\s)");
+	private static final Pattern LINE_BREAK_PATTERN = Pattern.compile("(^|\\s)(?<break>\\\\\\\\)($|\\s)");
+	
+	private String imageName;
+	private List<String> tags;
+	private ImageDescription description;
+	
+	
+	public static ImageInfoContainer fromDatabase(String imageName, List<String> tags) {
+		return new ImageInfoContainer(imageName, tags,
+				ImageDescriptionRepository.REPOSITORY.getImageDescriptionForName(imageName));
+	}
+	
+	private ImageInfoContainer(String imageName, List<String> tags, ImageDescription description) {
+		setImageName(imageName);
+		setTags(tags);
+		setDescription(description);
+	}
+
+
+
+	public String getImageName() {
+		return imageName;
+	}
+
+
+	private void setImageName(String imageName) {
+		this.imageName = imageName;
+	}
+
+	public List<String> getTags() {
+		return tags;
+	}
+	
+	public String getFormattedTags() {
+		String tagText = "";
+		if (tags != null) {
+			for (String tag : tags) {
+				tagText += tag + ", ";
+			}
+			if (tagText.length() > 2) {
+				tagText = tagText.substring(0, tagText.length() - 2); 
+			}
+		}
+		return tagText;
+	}
+
+	private void setTags(List<String> tags) {
+		this.tags = tags;
+	}
+
+	public ImageDescription getDescription() {
+		return description;
+	}
+	
+	public String getFormattedDescription() {
+		if (description == null) {
+			return "";
+		}
+		return formatLineBreaks(formatLinks(description.getDescription()));
+	}
+	
+	public String getFormattedExampleCommand() {
+		if (description == null) {
+			return "";
+		}
+		return formatLinks(description.getExampleCommand());
+	}
+
+	private void setDescription(ImageDescription description) {
+		this.description = description;
+	}
+	
+	private static String formatLinks(String original) {
+		String formatted = original;
+		Matcher m = LINK_PATTERN.matcher(formatted);
+		formatted = m.replaceAll("$1<a href=\"$2\">$2</a>$3");
+		return formatted;
+	}
+	
+	private static String formatLineBreaks(String original) {
+		String formatted = original;
+		Matcher m = LINE_BREAK_PATTERN.matcher(formatted);
+		formatted = m.replaceAll("$1<br/>$3");
+		return formatted;
+	}
+	
+}
