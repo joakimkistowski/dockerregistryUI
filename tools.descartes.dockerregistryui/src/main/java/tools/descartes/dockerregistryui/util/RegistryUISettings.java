@@ -27,10 +27,10 @@ public class RegistryUISettings {
 	/**
 	 * Public constants.
 	 */
-	public static final String GREETING_FILE = "greeting.wikitext";
+	public static final String HELLO_FILE = "hello.md";
 	
 	// This path is identical to the path specified in the persistence.xml 
-	public static final String VOLUME_PATH = "/var/lib/dockerregistryui/";
+	public static final String VOLUME_PATH = determineVolumePath();
 	
 	public static final RegistryUISettings SETTINGS = new RegistryUISettings();
 	
@@ -52,6 +52,14 @@ public class RegistryUISettings {
 	}
 	public String getContext() {
 		return FALLBACK_CONTEXT;
+	}
+	
+	private static String determineVolumePath() {
+		if (System.getProperty("os.name").startsWith("Windows")) {
+			return System.getProperty("java.io.tmpdir");
+		} else {
+			return "/var/lib/dockerregistryui/";
+		}
 	}
 	
 }
