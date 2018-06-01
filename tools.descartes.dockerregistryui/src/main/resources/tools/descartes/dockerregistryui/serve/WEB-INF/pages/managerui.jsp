@@ -11,7 +11,9 @@
   			<div class="col-xs-12">
   				<h1>Docker Registry</h1>
   				<h4>@ ${registryHost}</h4>
-  				<p></p>
+  				<div>
+  					${hello}
+  				</div>
   			</div>
 		</div>
 		
@@ -103,11 +105,12 @@
 								<div class="modal-body">
 									<div class="form-group">
 										<label for="${image.imageName}description">Short Description</label>
-										<textarea name="description" class="form-control" rows="4" id="${image.imageName}description" placeholder="Kurzbreschreibung"><c:if test="${not empty image.description}">${image.description.description}</c:if></textarea>
+										<textarea name="description" class="form-control" rows="4" id="${image.imageName}description" placeholder="Short Description"><c:if test="${not empty image.description}">${image.description.description}</c:if></textarea>
+										<small class="form-text text-muted">Supports <a href="http://commonmark.org/help/">CommonMark Markdown</a> formatting.</small>
 									</div>
 									<div class="form-group">
 										<label for="${image.imageName}exampleCommand">Example Docker-Run</label>
-										<input type="text" name="exampleCommand" class="form-control" id="${image.imageName}exampleCommand" placeholder="Beispielhafter Docker run Command"<c:if test="${not empty image.description}"> value="${image.description.exampleCommand}"</c:if>/>
+										<input type="text" name="exampleCommand" class="form-control" id="${image.imageName}exampleCommand" placeholder="Example Docker run command"<c:if test="${not empty image.description}"> value="${image.description.exampleCommand}"</c:if>/>
 										<input type="hidden" name="imageName" value="${image.imageName}"/>
 									</div>
 								</div>

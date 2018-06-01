@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import tools.descartes.dockerregistryui.util.MarkupObserver;
+
 /**
  * Transient Class for holding image information from both the registry and the database.
  * @author Joakim von Kistowski
@@ -27,7 +29,6 @@ import java.util.regex.Pattern;
 public class ImageInfoContainer {
 
 	private static final Pattern LINK_PATTERN = Pattern.compile("(^|\\s)(?<link>https??://\\S+)($|\\s)");
-	private static final Pattern LINE_BREAK_PATTERN = Pattern.compile("(^|\\s)(?<break>\\\\\\\\)($|\\s)");
 	
 	private String imageName;
 	private List<String> tags;
@@ -85,7 +86,7 @@ public class ImageInfoContainer {
 		if (description == null) {
 			return "";
 		}
-		return formatLineBreaks(formatLinks(description.getDescription()));
+		return MarkupObserver.markupToHTML(description.getDescription());
 	}
 	
 	public String getFormattedExampleCommand() {
@@ -105,12 +106,4 @@ public class ImageInfoContainer {
 		formatted = m.replaceAll("$1<a href=\"$2\">$2</a>$3");
 		return formatted;
 	}
-	
-	private static String formatLineBreaks(String original) {
-		String formatted = original;
-		Matcher m = LINE_BREAK_PATTERN.matcher(formatted);
-		formatted = m.replaceAll("$1<br/>$3");
-		return formatted;
-	}
-	
 }

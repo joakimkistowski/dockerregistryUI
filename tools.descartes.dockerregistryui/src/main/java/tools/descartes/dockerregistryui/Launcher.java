@@ -16,6 +16,8 @@
 package tools.descartes.dockerregistryui;
 
 
+import java.util.logging.Logger;
+
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.servlet.ServletHandler;
@@ -23,10 +25,13 @@ import org.eclipse.jetty.webapp.Configuration;
 import org.eclipse.jetty.webapp.WebAppContext;
 
 import tools.descartes.dockerregistryui.util.RegistryUISettings;
-import tools.descartes.dockerregistryui.util.MarkupHandler;
+import tools.descartes.dockerregistryui.persistence.ImageDescriptionRepository;
+import tools.descartes.dockerregistryui.util.MarkupObserver;
 
 public class Launcher {
 
+	private static final Logger LOG = Logger.getLogger(Launcher.class.getName());
+	
 	public static void main(String[] args) {
 		if (args.length > 0) {
 			RegistryUISettings.SETTINGS.setRegistryHost(args[0].trim());
@@ -65,8 +70,11 @@ public class Launcher {
 		webapp.addServlet(ManagerUIServlet.class, "");
 		webapp.addServlet(RemoveCategoryFromImageServlet.class, "/removecategoryfromimage");
 		webapp.addServlet(RemoveCategoryServlet.class, "/removecategory");
+		//Initialize database context by performing a random light-weight action on it.
+		//We might pass properties by calling configureEMFWProperties first
+		ImageDescriptionRepository.REPOSITORY.getCategories();
 		//Reads the md-file on startup and renders the greeting, also re-renders on file change notification
-		new MarkupHandler((fileName, html) -> webapp.getServletContext().setAttribute("greeting", html),
+		new MarkupObserver((fileName, html) -> webapp.getServletContext().setAttribute("hello", html),
 			RegistryUISettings.VOLUME_PATH, RegistryUISettings.HELLO_FILE);
 		//Redirection servlet, redirects root calls to the webapp.
 		ServletHandler rootRedirectHandler = new ServletHandler();
@@ -75,11 +83,9 @@ public class Launcher {
         server.setHandler(handlers);
         try {
 			server.start();
-			//server.dumpStdErr();
 	        server.join();
 		} catch (Exception e) {
-			System.out.println("Exception starting Jetty: \\" + e.getMessage());
-			e.printStackTrace();
+			LOG.severe("Exception starting Jetty: \\" + e.getMessage());
 		}
         
 	}

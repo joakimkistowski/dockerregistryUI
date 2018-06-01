@@ -15,8 +15,12 @@
  */
 package tools.descartes.dockerregistryui.util;
 
+import java.util.logging.Logger;
+
 public class RegistryUISettings {
 
+	private static final Logger LOG = Logger.getLogger(RegistryUISettings.class.getName());
+	
 	/**
 	 * Fallback constants:
 	 */
@@ -42,12 +46,14 @@ public class RegistryUISettings {
 		return registryProtocol;
 	}
 	public void setRegistryProtocol(String registryProtocol) {
+		LOG.info("Registry Protocol set to: " + registryProtocol);
 		this.registryProtocol = registryProtocol;
 	}
 	public String getRegistryHost() {
 		return registryHost;
 	}
 	public void setRegistryHost(String registryHost) {
+		LOG.info("Registry Host set to: " + registryHost);
 		this.registryHost = registryHost;
 	}
 	public String getContext() {
@@ -55,11 +61,14 @@ public class RegistryUISettings {
 	}
 	
 	private static String determineVolumePath() {
+		String path;
 		if (System.getProperty("os.name").startsWith("Windows")) {
-			return System.getProperty("java.io.tmpdir");
+			path = System.getProperty("java.io.tmpdir");
 		} else {
-			return "/var/lib/dockerregistryui/";
+			path = "/var/lib/dockerregistryui/";
 		}
+		LOG.info("Using volume path to write DB and look for md files: " + path);
+		return path;
 	}
 	
 }

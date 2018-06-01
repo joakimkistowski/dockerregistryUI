@@ -126,11 +126,4 @@ public class RESTClient {
 		}
 		LOG.info("Communicating with registry using URL prefix: " + prefix);
 	}
-	
-	public static void main(String args[]) {
-		System.out.println("Testing");
-		System.out.println(RESTClient.CLIENT.getResponseAsText("v2/_catalog"));
-		System.out.println(RESTClient.CLIENT.getReponseAsJsonListWithName("v2/_catalog", "repositories"));
-		System.out.println(RESTClient.CLIENT.getReponseAsJsonListWithName("v2/dvdstore-with-mysql/tags/list", "tags"));
-	}
 }
