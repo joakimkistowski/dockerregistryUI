@@ -24,6 +24,8 @@ import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 
+import org.apache.commons.text.StringEscapeUtils;
+
 @Entity
 public class ImageDescription {
 
@@ -48,14 +50,14 @@ public class ImageDescription {
 		
 	}
 	
-//	public void setId(long id) {
-//		this.id = id;
-//	}
-	
 	public String getDescription() {
-		return description;
+		return StringEscapeUtils.escapeHtml4(description);
 	}
 
+	String getRawDescription() {
+		return description;
+	}
+	
 	void setDescription(String description) {
 		this.description = description;
 	}

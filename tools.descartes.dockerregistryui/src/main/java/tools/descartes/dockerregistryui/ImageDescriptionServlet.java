@@ -49,7 +49,7 @@ public class ImageDescriptionServlet extends HttpServlet {
 		String exampleCommand = request.getParameter("exampleCommand");
 		if (imageName != null && !imageName.isEmpty() && description != null && exampleCommand != null) {
 			ImageDescriptionRepository.REPOSITORY.createOrUpdateImageDescription(
-					StringEscapeUtils.escapeHtml4(imageName), StringEscapeUtils.escapeHtml4(description), StringEscapeUtils.escapeHtml4(exampleCommand));
+					StringEscapeUtils.escapeHtml4(imageName), description, StringEscapeUtils.escapeHtml4(exampleCommand));
 		}
 		response.sendRedirect("./#images");
 	}

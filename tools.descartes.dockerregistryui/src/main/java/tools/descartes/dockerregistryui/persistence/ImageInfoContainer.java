@@ -86,7 +86,7 @@ public class ImageInfoContainer {
 		if (description == null) {
 			return "";
 		}
-		return MarkupObserver.markupToHTML(description.getDescription());
+		return MarkupObserver.markupToHTML(description.getRawDescription());
 	}
 	
 	public String getFormattedExampleCommand() {
