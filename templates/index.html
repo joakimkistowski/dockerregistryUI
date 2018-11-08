@@ -32,14 +32,14 @@
 						<button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> All</button>
 					</form>
 				</div>
-				{{range .Categories}}
+				{{range .Categories -}}
 				<div class="btn-group" role="group" aria-label="{{.Name}} Button Group">
 					<form action="./#images" accept-charset="UTF-8">
 						<input type="hidden" name="category" value="{{.ID}}"/>
 						<button type="submit" class="btn btn-primary" style="background-color: {{.Color}};"><span class="glyphicon glyphicon-menu-down"></span> {{.Name}}</button>
 					</form>
 				</div>
-				{{end}}
+				{{- end}}
 				<div class="btn-group" role="group" aria-label="Edit Categories Group">
 					<button type="button" class="btn btn-default" data-toggle="modal" data-target="#categoryeditmodal"><span class="glyphicon glyphicon-pencil"></span> Edit</button>
 				</div>
@@ -47,13 +47,13 @@
 				<table class="table table-striped">
 				<thead><th></th><th>Image</th><th>Tags</th><th>Description</th><th>Example Run</th><th></th></thead>
 					<tbody>
-						{{range .Images}}
+						{{range .Images -}}
 						<tr>
 							<td>
 								<div class="btn-group-vertical btn-group-xs" role="group">
-									{{range .Description.Categories}}
+									{{- range .Description.Categories -}}
 										<span class="btn btn-primary" style="background-color: {{.Color}}; cursor: default;">{{.Name}}</span>
-									{{end}}
+									{{- end -}}
 								</div>
 							</td>
 							<td><b>{{.Name}}</b></td>
@@ -62,7 +62,7 @@
 							<td class="col-md-6"><code>{{.Description.ExampleCommand}}</code><!--TODO: .FormattedCommands, empty descriptions?--></td>
 							<td><button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#{{.Name}}modal"><span class="glyphicon glyphicon-pencil"></span></button></td>
 						</tr>
-						{{end}}
+						{{- end}}
 					</tbody>
 				</table>
 					{{- /* Image description edit modals. */ -}}
@@ -74,16 +74,17 @@
 									<button type="button" class="close" data-dismiss="modal">&times;</button>
 									<h4 class="modal-title">{{.Name}}</h4>
 								</div>
-								{{- /* <c:if test="{{not empty image.description}}"> */ -}}
+								{{if ne .Description.ID 0}}
 									<div class="modal-body">
 										<div class="form-group">
 											<label for="{{.Name}}categorylist">Categories of {{.Name}}</label>
 											<div id="{{.Name}}categorylist">
+											{{ $parentImage := . }}
 											{{range .Description.Categories}}
 												<div class="btn-group" role="group">
 													<form method="post" action="{{$.Settings.URIRemoveCategoryFromImage}}" accept-charset="UTF-8">
 														<input type="hidden" name="category" value="{{.ID}}"/>
-														<input type="hidden" name="image" value="{{.Description.ID}}"/>
+														<input type="hidden" name="image" value="{{$parentImage.Description.ID}}"/>
 														<button type="submit" class="btn btn-primary" style="background-color: {{.Color}};">
 															{{.Name}} <span class="glyphicon glyphicon-remove-circle"></span>
 														</button>
@@ -94,27 +95,28 @@
 										</div>
 										<div class="form-group">
 											<label for="{{.Name}}categorylist">Other Categories</label>
-											<div id="{{.Name}}categorylist"> 
-												{{range .OtherCategories}}
+											<div id="{{.Name}}categorylist">
+												{{ $parentImage := . -}}
+												{{- range .OtherCategories -}}
 												<div class="btn-group" role="group">
 													<form method="post" action="{{$.Settings.URIAddCategoryToImage}}" accept-charset="UTF-8">
 														<input type="hidden" name="category" value="{{.ID}}"/>
-														<input type="hidden" name="image" value="{{.Description.ID}}"/>
+														<input type="hidden" name="image" value="{{$parentImage.Description.ID}}"/>
 														<button type="submit" class="btn btn-primary" style="background-color: {{.Color}};">
 															<span class="glyphicon glyphicon-plus"></span> {{.Name}}
 														</button>
 													</form>
 												</div>
-												{{end}}
+												{{- end}}
 											</div>
 										</div>
 									</div>
-									{{- /* </c:if> */ -}}
+									{{- end}}
 								<form method="post" action="{{$.Settings.URIImageDescription}}" accept-charset="UTF-8">
 									<div class="modal-body">
 										<div class="form-group">
 											<label for="{{.Name}}description">Short Description</label>
-											<textarea name="description" class="form-control" rows="4" id="{{.Name}}description" placeholder="Short Description"><!--TODO: empty descriptions?-->{{.Description.Description}}</textarea>
+											<textarea name="description" class="form-control" rows="4" id="{{.Name}}description" placeholder="Short Description">{{.Description.Description}}</textarea><!--TODO: empty descriptions?-->
 											<small class="form-text text-muted">Supports <a href="http://commonmark.org/help/">CommonMark Markdown</a> formatting.</small>
 										</div>
 										<div class="form-group">

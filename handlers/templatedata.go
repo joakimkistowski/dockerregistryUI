@@ -21,7 +21,7 @@ type ImageData struct {
 	Name            string
 	Tags            []string
 	Description     *persistence.ImageDescription
-	OtherCategories []*persistence.ImageCategory
+	OtherCategories []persistence.ImageCategory
 }
 
 /*MergeImageData Merges image data retreived from the registry with database data for use in the template. */
@@ -59,8 +59,8 @@ func InitializeUITemplateData(settings utils.DockerRegistryUISettings,
 func (imageData *ImageData) populateOtherCategories(allCategories []persistence.ImageCategory) {
 	imageData.OtherCategories = imageData.OtherCategories[:0]
 	for _, cat := range allCategories {
-		if containsCategory(imageData.Description.Categories, cat) {
-			imageData.OtherCategories = append(imageData.OtherCategories, &cat)
+		if !containsCategory(imageData.Description.Categories, cat) {
+			imageData.OtherCategories = append(imageData.OtherCategories, cat)
 		}
 	}
 }
