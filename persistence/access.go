@@ -70,10 +70,10 @@ func (handle *DBHandle) retreiveWithAttribute(
 }
 
 /*FindAllImageCategories Finds and returns all image categories. */
-func (handle *DBHandle) FindAllImageCategories() *[]ImageCategory {
+func (handle *DBHandle) FindAllImageCategories() []ImageCategory {
 	var imageCategories []ImageCategory
 	handle.db.Find(&imageCategories)
-	return &imageCategories
+	return imageCategories
 }
 
 /*DeleteImageDescription Deletes an image description if it exists. */

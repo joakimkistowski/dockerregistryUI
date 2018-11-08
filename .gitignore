@@ -47,3 +47,9 @@ target/
 #IDEA
 *.iml
 /.idea
+
+# binary
+dockerregistryUI
+
+# test databases
+*.db
