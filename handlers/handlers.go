@@ -28,6 +28,10 @@ func New(settings utils.DockerRegistryUISettings, client *utils.RegistryHTTPClie
 /*IndexHandler Handles requests to the main index page. */
 func (context *HandlerContext) IndexHandler(w http.ResponseWriter, r *http.Request) {
 	templateData := InitializeUITemplateData(context.settings, context.db, context.client)
+	categoryQuery := r.URL.Query().Get("category")
+	if categoryID, err := strconv.ParseUint(categoryQuery, 10, 64); err == nil {
+		templateData.FilterImages(uint(categoryID))
+	}
 	setCommonHeaders(w)
 	err := templates.ExecuteTemplate(w, "index.html", templateData)
 	if err != nil {

@@ -48,6 +48,7 @@
 				<thead><th></th><th>Image</th><th>Tags</th><th>Description</th><th>Example Run</th><th></th></thead>
 					<tbody>
 						{{range .Images -}}
+						{{- if $.ImageMatchesCurrentFilter . -}}
 						<tr>
 							<td>
 								<div class="btn-group-vertical btn-group-xs" role="group">
@@ -62,11 +63,13 @@
 							<td class="col-md-6"><code>{{.Description.ExampleCommand}}</code><!--TODO: .FormattedCommands, empty descriptions?--></td>
 							<td><button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#{{.Name}}modal"><span class="glyphicon glyphicon-pencil"></span></button></td>
 						</tr>
+						{{- end -}}
 						{{- end}}
 					</tbody>
 				</table>
 					{{- /* Image description edit modals. */ -}}
-					{{range .Images}}
+					{{range .Images -}}
+					{{- if $.ImageMatchesCurrentFilter . -}}
 					<div id="{{.Name}}modal" class="modal fade" role="dialog">
 						<div class="modal-dialog">
 							<div class="modal-content">
@@ -133,7 +136,8 @@
 							</div>
 						</div>
 					</div>
-					{{end}}
+					{{end -}}
+					{{- end -}}
 					{{- /* Category Edit Modal */ -}}
 						<div id="categoryeditmodal" class="modal fade" role="dialog">
 							<div class="modal-dialog"><div class="modal-content">
