@@ -42,7 +42,7 @@ func (context *HandlerContext) IndexHandler(w http.ResponseWriter, r *http.Reque
 
 /*CreateCategoryHandler Creates a new category from a form using "name" and "color". */
 func (context *HandlerContext) CreateCategoryHandler(w http.ResponseWriter, r *http.Request) {
-	if checkForPostWithError(w, r) {
+	if !checkForPostWithError(w, r) {
 		return
 	}
 	r.ParseForm()
@@ -65,7 +65,7 @@ func escapeColor(color string) string {
 
 /*RemoveCategoryHandler Remvoes a category from a POST using "id". */
 func (context *HandlerContext) RemoveCategoryHandler(w http.ResponseWriter, r *http.Request) {
-	if checkForPostWithError(w, r) {
+	if !checkForPostWithError(w, r) {
 		return
 	}
 	r.ParseForm()
@@ -82,7 +82,7 @@ func (context *HandlerContext) RemoveCategoryHandler(w http.ResponseWriter, r *h
 
 /*CreateDescriptionHandler Creates a description from a form using "imageName", "description", "exampleCommand". */
 func (context *HandlerContext) CreateDescriptionHandler(w http.ResponseWriter, r *http.Request) {
-	if checkForPostWithError(w, r) {
+	if !checkForPostWithError(w, r) {
 		return
 	}
 	r.ParseForm()
@@ -98,7 +98,7 @@ func (context *HandlerContext) CreateDescriptionHandler(w http.ResponseWriter, r
 
 /*AddCategoryToDescriptionHandler Adds a category to a descriptio from a POST using "category" and "image". */
 func (context *HandlerContext) AddCategoryToDescriptionHandler(w http.ResponseWriter, r *http.Request) {
-	if checkForPostWithError(w, r) {
+	if !checkForPostWithError(w, r) {
 		return
 	}
 	r.ParseForm()
@@ -116,7 +116,7 @@ func (context *HandlerContext) AddCategoryToDescriptionHandler(w http.ResponseWr
 
 /*RemoveCategoryFromDescriptionHandler Removes a category from a descriptio from a POST using "category" and "image". */
 func (context *HandlerContext) RemoveCategoryFromDescriptionHandler(w http.ResponseWriter, r *http.Request) {
-	if checkForPostWithError(w, r) {
+	if !checkForPostWithError(w, r) {
 		return
 	}
 	r.ParseForm()
