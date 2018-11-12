@@ -6,6 +6,7 @@ import (
 	"html"
 	"html/template"
 	"regexp"
+	"strings"
 
 	"github.com/microcosm-cc/bluemonday"
 	"gitlab.com/golang-commonmark/markdown"
@@ -28,6 +29,7 @@ type UITemplateData struct {
 type ImageData struct {
 	Name                    string
 	Tags                    []string
+	FormattedTags           string
 	FormattedDescription    template.HTML
 	FormattedExampleCommand template.HTML
 	Description             *persistence.ImageDescription
@@ -53,6 +55,7 @@ func MergeAndFormatImageData(image utils.RegistryImage, description *persistence
 	var data ImageData
 	data.Name = image.ImageName
 	data.Tags = image.ImageTags
+	data.FormattedTags = formatTags(data.Tags)
 	data.Description = description
 	unsafeFormattedDescription := []byte(markdownRenderer.RenderToString([]byte(description.Description)))
 	data.FormattedDescription = template.HTML(bluemonday.UGCPolicy().SanitizeBytes(unsafeFormattedDescription))
@@ -61,6 +64,17 @@ func MergeAndFormatImageData(image utils.RegistryImage, description *persistence
 	data.FormattedExampleCommand =
 		template.HTML(bluemonday.UGCPolicy().SanitizeBytes([]byte(unsafeFormattedExCommand)))
 	return data
+}
+
+func formatTags(tags []string) string {
+	var sb strings.Builder
+	for i, tag := range tags {
+		sb.WriteString(tag)
+		if i < len(tags)-1 {
+			sb.WriteString(", ")
+		}
+	}
+	return sb.String()
 }
 
 /*InitializeUITemplateData Initializes the data for a UI template, fetching it from registry and db and merging. */
