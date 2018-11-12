@@ -8,7 +8,7 @@ Designed with a focus on internal and development registries that require freque
 2. Documents user-provided descriptions and example run commands for images
 3. Images can be labelled and filtered for labels
 
-![The UI with a few example entries](https://user-images.githubusercontent.com/6392457/48358652-832ec580-e69b-11e8-9de1-de3321a0ec32.png)
+![The UI with a few example entries](https://user-images.githubusercontent.com/6392457/48358652-832ec580-e69b-11e8-9de1-de3321a0ec32.png =500x)
 
 ## Setup
 
