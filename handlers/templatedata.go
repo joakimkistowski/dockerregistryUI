@@ -3,10 +3,17 @@ package handlers
 import (
 	"dockerregistryUI/persistence"
 	"dockerregistryUI/utils"
+	"html"
 	"html/template"
+	"regexp"
+
+	"github.com/microcosm-cc/bluemonday"
+	"gitlab.com/golang-commonmark/markdown"
 )
 
 var templates = template.Must(template.ParseFiles("templates/index.html"))
+var autolinkRegex = regexp.MustCompile(`(?:^|\s)(?P<link>https??://\S+)(?:$|\s)`)
+var markdownRenderer = markdown.New()
 
 /*UITemplateData Data passed to the HTML template. */
 type UITemplateData struct {
@@ -19,31 +26,40 @@ type UITemplateData struct {
 
 /*ImageData Data about an image, collected from registry and database. */
 type ImageData struct {
-	Name            string
-	Tags            []string
-	Description     *persistence.ImageDescription
-	OtherCategories []persistence.ImageCategory
+	Name                    string
+	Tags                    []string
+	FormattedDescription    template.HTML
+	FormattedExampleCommand template.HTML
+	Description             *persistence.ImageDescription
+	OtherCategories         []persistence.ImageCategory
 }
 
 /*UITemplateCache Caches the template's data until the next database change.*/
 type UITemplateCache interface {
-	Cache(data *UITemplateData)
+	Cache(data UITemplateData)
 	Flush()
-	GetCached() (*UITemplateData, bool)
+	GetCached() (UITemplateData, bool)
 }
 
 /*InMemoryUITemplateCache Simple cache that holds a template's data in local memory until flushed. */
 type inMemoryUITemplateCache struct {
-	cached     *UITemplateData
+	cached     UITemplateData
 	cleanCache bool
 }
 
-/*MergeImageData Merges image data retreived from the registry with database data for use in the template. */
-func MergeImageData(image utils.RegistryImage, description *persistence.ImageDescription) ImageData {
+/*MergeAndFormatImageData Merges image data retreived from the registry with database data for use in the template.
+ *Also applies markdown processing to stored MD user inputs. */
+func MergeAndFormatImageData(image utils.RegistryImage, description *persistence.ImageDescription) ImageData {
 	var data ImageData
 	data.Name = image.ImageName
 	data.Tags = image.ImageTags
 	data.Description = description
+	unsafeFormattedDescription := []byte(markdownRenderer.RenderToString([]byte(description.Description)))
+	data.FormattedDescription = template.HTML(bluemonday.UGCPolicy().SanitizeBytes(unsafeFormattedDescription))
+	unsafeFormattedExCommand := html.EscapeString(description.ExampleCommand)
+	unsafeFormattedExCommand = autolinkRegex.ReplaceAllString(unsafeFormattedExCommand, `<a href="$1">$1</a>`)
+	data.FormattedExampleCommand =
+		template.HTML(bluemonday.UGCPolicy().SanitizeBytes([]byte(unsafeFormattedExCommand)))
 	return data
 }
 
@@ -60,10 +76,10 @@ func InitializeUITemplateData(settings utils.DockerRegistryUISettings,
 	for _, registryImage := range registryImages {
 		var imageData ImageData
 		if description, err := handle.FindImageDescriptionByName(registryImage.ImageName); err == nil {
-			imageData = MergeImageData(registryImage, description)
+			imageData = MergeAndFormatImageData(registryImage, description)
 
 		} else {
-			imageData = MergeImageData(registryImage, &persistence.ImageDescription{})
+			imageData = MergeAndFormatImageData(registryImage, &persistence.ImageDescription{})
 		}
 		imageData.populateOtherCategories(data.Categories)
 		data.Images = append(data.Images, imageData)
@@ -109,7 +125,7 @@ func containsCategory(categories []persistence.ImageCategory, category persisten
 }
 
 /*Cache Caches the current UI template data in local memory. */
-func (cache *inMemoryUITemplateCache) Cache(data *UITemplateData) {
+func (cache *inMemoryUITemplateCache) Cache(data UITemplateData) {
 	cache.cached = data
 	cache.cleanCache = true
 }
@@ -120,13 +136,13 @@ func (cache *inMemoryUITemplateCache) Flush() {
 }
 
 /*GetCached Returns the cached element and a bool indicating if the cached element is clean (true if it is clean). */
-func (cache *inMemoryUITemplateCache) GetCached() (*UITemplateData, bool) {
+func (cache *inMemoryUITemplateCache) GetCached() (UITemplateData, bool) {
 	return cache.cached, cache.cleanCache
 }
 
 func newInMemoryUITemplateCache() *inMemoryUITemplateCache {
 	return &inMemoryUITemplateCache{
-		cached:     &UITemplateData{},
+		cached:     UITemplateData{},
 		cleanCache: false,
 	}
 }

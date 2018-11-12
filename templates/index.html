@@ -59,8 +59,8 @@
 							</td>
 							<td><b>{{.Name}}</b></td>
 							<td><!--TODO: .FormattedTags--></td>
-							<td>{{.Description.Description}}<!--TODO: .FormattedDescription, empty descriptions?--></td>
-							<td class="col-md-6"><code>{{.Description.ExampleCommand}}</code><!--TODO: .FormattedCommands, empty descriptions?--></td>
+							<td>{{.FormattedDescription}}</td>
+							<td class="col-md-6"><code>{{.FormattedExampleCommand}}</code></td>
 							<td><button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#{{.Name}}modal"><span class="glyphicon glyphicon-pencil"></span></button></td>
 						</tr>
 						{{- end -}}
@@ -119,12 +119,12 @@
 									<div class="modal-body">
 										<div class="form-group">
 											<label for="{{.Name}}description">Short Description</label>
-											<textarea name="description" class="form-control" rows="4" id="{{.Name}}description" placeholder="Short Description">{{.Description.Description}}</textarea><!--TODO: empty descriptions?-->
+											<textarea name="description" class="form-control" rows="4" id="{{.Name}}description" placeholder="Short Description">{{.Description.Description}}</textarea>
 											<small class="form-text text-muted">Supports <a href="http://commonmark.org/help/">CommonMark Markdown</a> formatting.</small>
 										</div>
 										<div class="form-group">
 											<label for="{{.Name}}exampleCommand">Example Docker-Run</label>
-											<input type="text" name="exampleCommand" class="form-control" id="{{.Name}}exampleCommand" placeholder="Example Docker run command" value="{{.Description.ExampleCommand}}"/><!--TODO: empty descriptions?-->
+											<input type="text" name="exampleCommand" class="form-control" id="{{.Name}}exampleCommand" placeholder="Example Docker run command" value="{{.Description.ExampleCommand}}"/>
 											<input type="hidden" name="imageName" value="{{.Name}}"/>
 										</div>
 									</div>

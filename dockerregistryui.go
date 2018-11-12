@@ -12,7 +12,6 @@ func main() {
 	settings := utils.SettingsFromEnvironmentVariables()
 	client := utils.NewRegistryHTTPClient(settings)
 	dbconfig := persistence.NewDBConfig()
-	dbconfig.DBPathPrefix = "./"
 	db := persistence.StartPersistenceContext(dbconfig)
 	context := handlers.New(settings, client, db)
 	fileServer := http.FileServer(http.Dir("static"))

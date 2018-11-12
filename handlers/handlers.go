@@ -34,10 +34,10 @@ func New(settings utils.DockerRegistryUISettings, client *utils.RegistryHTTPClie
 
 /*IndexHandler Handles requests to the main index page. */
 func (context *HandlerContext) IndexHandler(w http.ResponseWriter, r *http.Request) {
-	var templateData *UITemplateData
+	var templateData UITemplateData
 	var hasCache bool
 	if templateData, hasCache = context.cache.GetCached(); !hasCache {
-		*templateData = InitializeUITemplateData(context.settings, context.db, context.client)
+		templateData = InitializeUITemplateData(context.settings, context.db, context.client)
 		context.cache.Cache(templateData)
 	}
 	categoryQuery := r.URL.Query().Get("category")
