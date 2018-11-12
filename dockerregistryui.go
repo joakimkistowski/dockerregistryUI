@@ -10,8 +10,6 @@ import (
 
 func main() {
 	settings := utils.SettingsFromEnvironmentVariables()
-
-	settings.IgnoreInsecureHTTPS = true
 	client := utils.NewRegistryHTTPClient(settings)
 	dbconfig := persistence.NewDBConfig()
 	dbconfig.DBPathPrefix = "./"
@@ -23,6 +21,7 @@ func main() {
 	http.HandleFunc(settings.URIRemoveCategory, context.RemoveCategoryHandler)
 	http.HandleFunc(settings.URIImageDescription, context.CreateDescriptionHandler)
 	http.HandleFunc(settings.URIAddCategoryToImage, context.AddCategoryToDescriptionHandler)
+	http.HandleFunc(settings.URIRemoveCategoryFromImage, context.RemoveCategoryFromDescriptionHandler)
 	http.HandleFunc(settings.ContextRoot+"/", context.IndexHandler)
 	http.HandleFunc(settings.ContextRoot, context.RootRedirectHandler)
 	http.HandleFunc("/", context.RootRedirectHandler)

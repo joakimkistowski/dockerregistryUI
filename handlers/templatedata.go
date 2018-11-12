@@ -25,6 +25,19 @@ type ImageData struct {
 	OtherCategories []persistence.ImageCategory
 }
 
+/*UITemplateCache Caches the template's data until the next database change.*/
+type UITemplateCache interface {
+	Cache(data *UITemplateData)
+	Flush()
+	GetCached() (*UITemplateData, bool)
+}
+
+/*InMemoryUITemplateCache Simple cache that holds a template's data in local memory until flushed. */
+type inMemoryUITemplateCache struct {
+	cached     *UITemplateData
+	cleanCache bool
+}
+
 /*MergeImageData Merges image data retreived from the registry with database data for use in the template. */
 func MergeImageData(image utils.RegistryImage, description *persistence.ImageDescription) ImageData {
 	var data ImageData
@@ -93,4 +106,27 @@ func containsCategory(categories []persistence.ImageCategory, category persisten
 		}
 	}
 	return false
+}
+
+/*Cache Caches the current UI template data in local memory. */
+func (cache *inMemoryUITemplateCache) Cache(data *UITemplateData) {
+	cache.cached = data
+	cache.cleanCache = true
+}
+
+/*Flush Flushes the current UI template data from local memory. */
+func (cache *inMemoryUITemplateCache) Flush() {
+	cache.cleanCache = false
+}
+
+/*GetCached Returns the cached element and a bool indicating if the cached element is clean (true if it is clean). */
+func (cache *inMemoryUITemplateCache) GetCached() (*UITemplateData, bool) {
+	return cache.cached, cache.cleanCache
+}
+
+func newInMemoryUITemplateCache() *inMemoryUITemplateCache {
+	return &inMemoryUITemplateCache{
+		cached:     &UITemplateData{},
+		cleanCache: false,
+	}
 }

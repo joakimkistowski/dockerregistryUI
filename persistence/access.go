@@ -116,7 +116,7 @@ func (handle *DBHandle) RemoveImageCategoryFromImageDescription(categoryID uint,
 	imageCategory := ImageCategory{}
 	tx := handle.db.Begin()
 	if !tx.Where("id = ?", descriptionID).First(&imageDescription).RecordNotFound() &&
-		!tx.Where("id = ?", descriptionID).First(&imageCategory).RecordNotFound() {
+		!tx.Where("id = ?", categoryID).First(&imageCategory).RecordNotFound() {
 		if err := tx.Model(&imageDescription).Association("Categories").Delete(&imageCategory).Error; err != nil {
 			tx.Rollback()
 			log.Fatalf("Could not remove from association: %s\n", err)

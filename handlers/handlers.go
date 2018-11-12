@@ -17,17 +17,29 @@ type HandlerContext struct {
 	settings    utils.DockerRegistryUISettings
 	client      *utils.RegistryHTTPClient
 	db          *persistence.DBHandle
+	cache       UITemplateCache
 }
 
 /*New Initializes a new HandlerContext. */
 func New(settings utils.DockerRegistryUISettings, client *utils.RegistryHTTPClient,
 	db *persistence.DBHandle) *HandlerContext {
-	return &HandlerContext{initialized: true, settings: settings, client: client, db: db}
+	return &HandlerContext{
+		initialized: true,
+		settings:    settings,
+		client:      client,
+		db:          db,
+		cache:       newInMemoryUITemplateCache(),
+	}
 }
 
 /*IndexHandler Handles requests to the main index page. */
 func (context *HandlerContext) IndexHandler(w http.ResponseWriter, r *http.Request) {
-	templateData := InitializeUITemplateData(context.settings, context.db, context.client)
+	var templateData *UITemplateData
+	var hasCache bool
+	if templateData, hasCache = context.cache.GetCached(); !hasCache {
+		*templateData = InitializeUITemplateData(context.settings, context.db, context.client)
+		context.cache.Cache(templateData)
+	}
 	categoryQuery := r.URL.Query().Get("category")
 	if categoryID, err := strconv.ParseUint(categoryQuery, 10, 64); err == nil {
 		templateData.FilterImages(uint(categoryID))
@@ -49,6 +61,7 @@ func (context *HandlerContext) CreateCategoryHandler(w http.ResponseWriter, r *h
 	name := r.PostFormValue("name")
 	color := r.PostFormValue("color")
 	if len(name) > 0 {
+		context.cache.Flush()
 		context.db.CreateAndPersistImageCategory(name, escapeColor(color))
 	}
 	context.RootRedirectHandler(w, r)
@@ -72,6 +85,7 @@ func (context *HandlerContext) RemoveCategoryHandler(w http.ResponseWriter, r *h
 	id := r.PostFormValue("id")
 	if len(id) > 0 {
 		if parsedID, err := strconv.ParseUint(id, 10, 64); err == nil {
+			context.cache.Flush()
 			context.db.DeleteImageCategory(uint(parsedID))
 		} else {
 			log.Printf("Cannot delete image category with invalid id: %s\n", id)
@@ -90,6 +104,7 @@ func (context *HandlerContext) CreateDescriptionHandler(w http.ResponseWriter, r
 	description := r.PostFormValue("description")
 	exampleCommand := r.PostFormValue("exampleCommand")
 	if len(imageName) > 0 {
+		context.cache.Flush()
 		context.db.CreateAndPersistOrUpdateImageDescription(imageName,
 			description, exampleCommand)
 	}
@@ -108,6 +123,7 @@ func (context *HandlerContext) AddCategoryToDescriptionHandler(w http.ResponseWr
 		parsedCategoryID, categoryErr := strconv.ParseUint(categoryID, 10, 64)
 		parsedDescriptionID, descriptionErr := strconv.ParseUint(descriptionID, 10, 64)
 		if categoryErr == nil && descriptionErr == nil {
+			context.cache.Flush()
 			context.db.AddImageCategoryToImageDescription(uint(parsedCategoryID), uint(parsedDescriptionID))
 		}
 	}
@@ -126,6 +142,7 @@ func (context *HandlerContext) RemoveCategoryFromDescriptionHandler(w http.Respo
 		parsedCategoryID, categoryErr := strconv.ParseUint(categoryID, 10, 64)
 		parsedDescriptionID, descriptionErr := strconv.ParseUint(descriptionID, 10, 64)
 		if categoryErr == nil && descriptionErr == nil {
+			context.cache.Flush()
 			context.db.RemoveImageCategoryFromImageDescription(uint(parsedCategoryID), uint(parsedDescriptionID))
 		}
 	}
