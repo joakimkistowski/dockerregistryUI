@@ -13,7 +13,7 @@ RUN go get -u github.com/jinzhu/gorm
 RUN go get -u github.com/jinzhu/gorm/dialects/sqlite
 RUN go test ./persistence
 RUN GOOS=linux go build -v .
-#copy all static files to webmusicplayer dir, then copy them to the running images in one command, merging image layers
+
 RUN mkdir -p /opt/dockerregistryUI/
 COPY ./templates /opt/dockerregistryUI/templates
 COPY ./static /opt/dockerregistryUI/static
