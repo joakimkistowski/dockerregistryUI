@@ -45,7 +45,7 @@ func (context *HandlerContext) IndexHandler(w http.ResponseWriter, r *http.Reque
 		templateData.FilterImages(uint(categoryID))
 	}
 	setCommonHeaders(w)
-	err := templates.ExecuteTemplate(w, "index.html", templateData)
+	err := templates.ExecuteTemplate(w, "index.gohtml", templateData)
 	if err != nil {
 		log.Printf("Error rendering template: %s\n", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)

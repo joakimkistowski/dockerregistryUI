@@ -23,7 +23,6 @@
 					</div>
 				</div>
 			</div>
-			
 			<div id="images" class="row"><div class="col-xs-12">
 				<h2>Available Images</h2>
 				<div class="btn-toolbar" role="toolbar" aria-label="Category Toolbar">
@@ -82,8 +81,8 @@
 										<div class="form-group">
 											<label for="{{.Name}}categorylist">Categories of {{.Name}}</label>
 											<div id="{{.Name}}categorylist">
-											{{ $parentImage := . }}
-											{{range .Description.Categories}}
+											{{ $parentImage := . -}}
+											{{- range .Description.Categories -}}
 												<div class="btn-group" role="group">
 													<form method="post" action="{{$.Settings.URIRemoveCategoryFromImage}}" accept-charset="UTF-8">
 														<input type="hidden" name="category" value="{{.ID}}"/>
@@ -93,7 +92,7 @@
 														</button>
 													</form>
 												</div>
-											{{end}}
+											{{end -}}
 											</div>
 										</div>
 										<div class="form-group">
@@ -146,7 +145,7 @@
 									<h4 class="modal-title">Categories</h4>
 								</div>
 								<div class="modal-body">
-									{{range .Categories}}
+									{{- range .Categories -}}
 									<div class="btn-group" role="group" aria-label="{{.Name}} Button Group">
 										<form method="post" action="{{$.Settings.URIRemoveCategory}}" accept-charset="UTF-8">
 											<input type="hidden" name="id" value="{{.ID}}"/>
@@ -155,7 +154,7 @@
 											</button>
 										</form>
 									</div>
-									{{end}}
+									{{- end}}
 								</div>
 								<div class="modal-body">
 									<form class="form-inline" method="post" action="{{.Settings.URICreateCategory}}" accept-charset="UTF-8">

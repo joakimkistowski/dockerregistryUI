@@ -76,6 +76,9 @@ func SettingsFromEnvironmentVariables() DockerRegistryUISettings {
 	settings := DefaultSettings()
 	if host := os.Getenv(RegistryHostEnvironmentVariableName); host != "" {
 		settings.RegistryHostName = host
+	} else {
+		log.Printf("No Docker registry host name specified. Specify one using environment variable: %s\n",
+			RegistryHostEnvironmentVariableName)
 	}
 	if protocol := os.Getenv(RegistryProtocolEnvironmentVariableName); protocol != "" {
 		settings.RegistryProtocol = protocol

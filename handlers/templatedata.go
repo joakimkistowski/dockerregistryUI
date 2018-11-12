@@ -12,7 +12,7 @@ import (
 	"gitlab.com/golang-commonmark/markdown"
 )
 
-var templates = template.Must(template.ParseFiles("templates/index.html"))
+var templates = template.Must(template.ParseFiles("templates/index.gohtml"))
 var autolinkRegex = regexp.MustCompile(`(?:^|\s)(?P<link>https??://\S+)(?:$|\s)`)
 var markdownRenderer = markdown.New()
 
