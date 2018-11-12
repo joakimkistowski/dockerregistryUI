@@ -18,11 +18,12 @@ var markdownRenderer = markdown.New()
 
 /*UITemplateData Data passed to the HTML template. */
 type UITemplateData struct {
-	Settings         utils.DockerRegistryUISettings
-	HelloMessage     string
-	Categories       []persistence.ImageCategory
-	Images           []ImageData
-	filterCategoryID uint
+	Settings              utils.DockerRegistryUISettings
+	HelloMessage          string
+	FormattedHelloMessage template.HTML
+	Categories            []persistence.ImageCategory
+	Images                []ImageData
+	filterCategoryID      uint
 }
 
 /*ImageData Data about an image, collected from registry and database. */
@@ -82,10 +83,12 @@ func InitializeUITemplateData(settings utils.DockerRegistryUISettings,
 	handle *persistence.DBHandle, client *utils.RegistryHTTPClient) UITemplateData {
 	data := UITemplateData{
 		Settings:         settings,
-		HelloMessage:     "temporary hello",
+		HelloMessage:     "This is a Hello message with some usful information for your users.",
 		Categories:       handle.FindAllImageCategories(),
 		filterCategoryID: 0,
 	}
+	unsafeFormattedHello := []byte(markdownRenderer.RenderToString([]byte(data.HelloMessage)))
+	data.FormattedHelloMessage = template.HTML(bluemonday.UGCPolicy().SanitizeBytes(unsafeFormattedHello))
 	registryImages := client.RetreiveRegistryImages()
 	for _, registryImage := range registryImages {
 		var imageData ImageData
