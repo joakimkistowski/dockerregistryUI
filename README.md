@@ -28,6 +28,8 @@ In general, you can configure the registry UI using environment variables. The f
 * `REGISTRY_PROTOCOL` : The protocol the registry is listening on. Is `https` by default.
 * `REGISTRY_URL` : This optional variable can be set to specify the URL the UI should use to access the registry. It is usually automatically derived from `REGISTRY_HOST` and `REGISTRY_PROTOCOL`. However, in some cases, you may want your UI to access the registry using a URL that differs from the public protocol or hostname (e.g., to facilitate access via a local network). This variable can be set to achieve this.
 * `IGNORE_INSECURE_HTTPS` : Set this to `true` to get the UI to ignore bad or missing certificates when accessing the registry via HTTPS. Usage of this setting is not recommended. You may want to side-step the HTTPS-connection by accessing the registry via http from a local network, a linked container, or on the same pod using the `REGISTRY_URL` variable instead.
+* `REGISTRY_BASIC_AUTH_USER` : User to access registries protected with basic authentication.
+* `REGISTRY_BASIC_AUTH_PASSWORD` : Password to acces registries protected with basic authentication.
 
 ## Accessing the UI
 

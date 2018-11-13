@@ -31,12 +31,20 @@ const RegistryURLEnvironmentVariableName string = "REGISTRY_URL"
 // IgnoreInsecureHTTPSEnvironmentVariableName Name of the environemnt variable igonoring insecure HTTPS.
 const IgnoreInsecureHTTPSEnvironmentVariableName string = "IGNORE_INSECURE_HTTPS"
 
+// RegistryBasicAuthUserEnvironmentVariableName Name of the environemnt variable for a basic authentication user.
+const RegistryBasicAuthUserEnvironmentVariableName string = "REGISTRY_BASIC_AUTH_USER"
+
+// RegistryBasicAuthPasswordEnvironmentVariableName Name of the environemnt variable for a basic authentication pw.
+const RegistryBasicAuthPasswordEnvironmentVariableName string = "REGISTRY_BASIC_AUTH_PASSWORD"
+
 // DockerRegistryUISettings Contains all settings for the registry ui.
 type DockerRegistryUISettings struct {
 	ContextRoot                string
 	RegistryHostName           string
 	RegistryProtocol           string
 	RegistryURL                string
+	RegistryBasicAuthUser      string
+	RegistryBasicAuthPassword  string
 	IgnoreInsecureHTTPS        bool
 	URIStaticDir               string
 	URIAddCategoryToImage      string
@@ -54,6 +62,8 @@ func DefaultSettings() DockerRegistryUISettings {
 		RegistryHostName:           fallbackRegistryHostName,
 		RegistryProtocol:           fallbackRegistryProtocol,
 		RegistryURL:                fallbackRegistryProtocol + "://" + fallbackRegistryHostName + "/",
+		RegistryBasicAuthUser:      "",
+		RegistryBasicAuthPassword:  "",
 		IgnoreInsecureHTTPS:        false,
 		URIStaticDir:               fallbackURIStaticDir,
 		URIAddCategoryToImage:      fallbackURIAddCategoryToImage,
@@ -101,6 +111,12 @@ func SettingsFromEnvironmentVariables() DockerRegistryUISettings {
 		} else {
 			settings.IgnoreInsecureHTTPS = ignoreb
 		}
+	}
+	if user := os.Getenv(RegistryBasicAuthUserEnvironmentVariableName); user != "" {
+		settings.RegistryBasicAuthUser = user
+	}
+	if pw := os.Getenv(RegistryBasicAuthPasswordEnvironmentVariableName); pw != "" {
+		settings.RegistryBasicAuthPassword = pw
 	}
 	return settings
 }

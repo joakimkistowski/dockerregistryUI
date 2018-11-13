@@ -95,19 +95,22 @@ func (client *RegistryHTTPClient) CheckUpToDateOrRetreiveRegistryImages(
 	// return if up-to-date version on image count mismatch, or check if the tag counts per image have changed
 	if !registryUpToDate {
 		return imageInfos, false
-	} else {
-		for i, retreivedImage := range imageInfos {
-			if len(retreivedImage.ImageTags) != len(imagesToCheck[i].GetImageTags()) ||
-				retreivedImage.ImageName != imagesToCheck[i].GetImageName() {
-				return imageInfos, false
-			}
+	}
+	for i, retreivedImage := range imageInfos {
+		if len(retreivedImage.ImageTags) != len(imagesToCheck[i].GetImageTags()) ||
+			retreivedImage.ImageName != imagesToCheck[i].GetImageName() {
+			return imageInfos, false
 		}
 	}
 	return []RegistryImage{}, true
 }
 
 func getResponse(settings DockerRegistryUISettings, uri string) (*http.Response, error) {
-	response, err := http.Get(settings.RegistryURL + uri)
+	request, err := http.NewRequest("GET", settings.RegistryURL+uri, nil) //http.Get(settings.RegistryURL + uri)
+	if len(settings.RegistryBasicAuthUser) > 0 || len(settings.RegistryBasicAuthPassword) > 0 {
+		request.SetBasicAuth(settings.RegistryBasicAuthUser, settings.RegistryBasicAuthPassword)
+	}
+	response, err := http.DefaultClient.Do(request)
 	if err != nil {
 		log.Printf("Could not get response from Registry at %s; error: %s\n", settings.RegistryURL+uri, err)
 	} else if response.StatusCode >= 400 {

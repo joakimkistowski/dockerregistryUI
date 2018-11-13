@@ -49,7 +49,10 @@ target/
 /.idea
 
 # binary
-dockerregistryUI
+/dockerregistryUI
 
 # test databases
 *.db
+
+# environment variables used in development
+/vars
