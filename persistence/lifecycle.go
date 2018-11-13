@@ -5,34 +5,30 @@ import (
 
 	"github.com/jinzhu/gorm"
 
-	/*Using SQLite by default.*/
+	// Using SQLite by default.
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
-/*DBConfig Configuration settings for persistence access. */
+// DBConfig Configuration settings for persistence access.
 type DBConfig struct {
-	initialized bool
-	/*DBPathPrefix Path prefix of DB file or URI for DB server. */
+	initialized  bool
 	DBPathPrefix string
-	/*DBName The database name (without its full path / URI). */
-	DBName string
-	/*DBType The database type. */
-	DBType string
+	DBName       string
+	DBType       string
 }
 
-/*DBHandle Handle for accessing the persistence context. */
+// DBHandle Handle for accessing the persistence context.
 type DBHandle struct {
-	db *gorm.DB
-	/*Config The database configuration. */
+	db     *gorm.DB
 	Config DBConfig
 }
 
-/*NewDBConfig Creates a new DBConfig with default values */
+// NewDBConfig Creates a new DBConfig with default values.
 func NewDBConfig() DBConfig {
 	return DBConfig{initialized: true, DBPathPrefix: "/data/", DBName: "registryui.db", DBType: "sqlite3"}
 }
 
-/*StartPersistenceContext Starts a persistence context and returns the handle to that context. */
+// StartPersistenceContext Starts a persistence context and returns the handle to that context.
 func StartPersistenceContext(config DBConfig) *DBHandle {
 	config.initIfNecessary()
 	db, err := gorm.Open(config.DBType, config.DBPathPrefix+config.DBName)
@@ -42,11 +38,12 @@ func StartPersistenceContext(config DBConfig) *DBHandle {
 	}
 	db.AutoMigrate(&ImageCategory{})
 	db.AutoMigrate(&ImageDescription{})
+	db.AutoMigrate(&HelloMessage{})
 	log.Println("Database connected: " + config.DBType + " @ " + config.DBPathPrefix + config.DBName)
 	return &DBHandle{db: db, Config: config}
 }
 
-/*StopPersistenceContext Stops the context managed using the handle. */
+// StopPersistenceContext Stops the context managed using the handle.
 func (handle *DBHandle) StopPersistenceContext() {
 	handle.db.Close()
 }

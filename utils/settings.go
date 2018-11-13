@@ -17,20 +17,21 @@ const fallbackURICreateCategory string = fallbackURIWritePrefix + "/createcatego
 const fallbackURIImageDescription string = fallbackURIWritePrefix + "/imagedescription"
 const fallbackURIRemoveCategoryFromImage string = fallbackURIWritePrefix + "/removecategoryfromimage"
 const fallbackURIRemoveCategory string = fallbackURIWritePrefix + "/removecategory"
+const fallbackURIHello string = fallbackURIWritePrefix + "/hello"
 
-/*RegistryHostEnvironmentVariableName Name of the environemnt variable for the registry host.*/
+// RegistryHostEnvironmentVariableName Name of the environemnt variable for the registry host.
 const RegistryHostEnvironmentVariableName string = "REGISTRY_HOST"
 
-/*RegistryProtocolEnvironmentVariableName Name of the environemnt variable for the registry's protocol.*/
+// RegistryProtocolEnvironmentVariableName Name of the environemnt variable for the registry's protocol.
 const RegistryProtocolEnvironmentVariableName string = "REGISTRY_PROTOCOL"
 
-/*RegistryURLEnvironmentVariableName Name of the environemnt variable for the registry's URL.*/
+// RegistryURLEnvironmentVariableName Name of the environemnt variable for the registry's URL.
 const RegistryURLEnvironmentVariableName string = "REGISTRY_URL"
 
-/*IgnoreInsecureHTTPSEnvironmentVariableName Name of the environemnt variable igonoring insecure HTTPS.*/
+// IgnoreInsecureHTTPSEnvironmentVariableName Name of the environemnt variable igonoring insecure HTTPS.
 const IgnoreInsecureHTTPSEnvironmentVariableName string = "IGNORE_INSECURE_HTTPS"
 
-/*DockerRegistryUISettings Contains all settings for the registry ui. */
+// DockerRegistryUISettings Contains all settings for the registry ui.
 type DockerRegistryUISettings struct {
 	ContextRoot                string
 	RegistryHostName           string
@@ -43,9 +44,10 @@ type DockerRegistryUISettings struct {
 	URIImageDescription        string
 	URIRemoveCategoryFromImage string
 	URIRemoveCategory          string
+	URIHello                   string
 }
 
-/*DefaultSettings Returns the default settings. */
+// DefaultSettings Returns the default settings.
 func DefaultSettings() DockerRegistryUISettings {
 	return DockerRegistryUISettings{
 		ContextRoot:                fallbackContextRoot,
@@ -59,10 +61,11 @@ func DefaultSettings() DockerRegistryUISettings {
 		URIImageDescription:        fallbackURIImageDescription,
 		URIRemoveCategoryFromImage: fallbackURIRemoveCategoryFromImage,
 		URIRemoveCategory:          fallbackURIRemoveCategory,
+		URIHello:                   fallbackURIHello,
 	}
 }
 
-/*DefaultSettingsForRegistryHostAndProtocol Returns the default settings for a custum registry host name. */
+// DefaultSettingsForRegistryHostAndProtocol Returns the default settings for a custum registry host name.
 func DefaultSettingsForRegistryHostAndProtocol(hostName string, protocol string) DockerRegistryUISettings {
 	settings := DefaultSettings()
 	settings.RegistryHostName = hostName
@@ -71,7 +74,7 @@ func DefaultSettingsForRegistryHostAndProtocol(hostName string, protocol string)
 	return settings
 }
 
-/*SettingsFromEnvironmentVariables Initializes settings using environment variables (see variables in Dockerfile). */
+// SettingsFromEnvironmentVariables Initializes settings using environment variables (see variables in Dockerfile).
 func SettingsFromEnvironmentVariables() DockerRegistryUISettings {
 	settings := DefaultSettings()
 	if host := os.Getenv(RegistryHostEnvironmentVariableName); host != "" {

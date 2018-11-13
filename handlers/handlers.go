@@ -11,7 +11,7 @@ import (
 
 var validColor = regexp.MustCompile(`#(?:\d|[a-f]){6}`)
 
-/*HandlerContext A context for the handlers. */
+// HandlerContext A context for the handlers.
 type HandlerContext struct {
 	initialized bool
 	settings    utils.DockerRegistryUISettings
@@ -20,7 +20,7 @@ type HandlerContext struct {
 	cache       UITemplateCache
 }
 
-/*New Initializes a new HandlerContext. */
+// New Initializes a new HandlerContext.
 func New(settings utils.DockerRegistryUISettings, client *utils.RegistryHTTPClient,
 	db *persistence.DBHandle) *HandlerContext {
 	return &HandlerContext{
@@ -32,7 +32,7 @@ func New(settings utils.DockerRegistryUISettings, client *utils.RegistryHTTPClie
 	}
 }
 
-/*IndexHandler Handles requests to the main index page. */
+// IndexHandler Handles requests to the main index page.
 func (context *HandlerContext) IndexHandler(w http.ResponseWriter, r *http.Request) {
 	var templateData UITemplateData
 	var hasCache bool
@@ -55,7 +55,7 @@ func (context *HandlerContext) IndexHandler(w http.ResponseWriter, r *http.Reque
 	}
 }
 
-/*CreateCategoryHandler Creates a new category from a form using "name" and "color". */
+// CreateCategoryHandler Creates a new category from a form using "name" and "color".
 func (context *HandlerContext) CreateCategoryHandler(w http.ResponseWriter, r *http.Request) {
 	if !checkForPostWithError(w, r) {
 		return
@@ -79,7 +79,7 @@ func escapeColor(color string) string {
 	return ""
 }
 
-/*RemoveCategoryHandler Remvoes a category from a POST using "id". */
+// RemoveCategoryHandler Remvoes a category from a POST using "id".
 func (context *HandlerContext) RemoveCategoryHandler(w http.ResponseWriter, r *http.Request) {
 	if !checkForPostWithError(w, r) {
 		return
@@ -97,7 +97,7 @@ func (context *HandlerContext) RemoveCategoryHandler(w http.ResponseWriter, r *h
 	context.RootRedirectHandler(w, r)
 }
 
-/*CreateDescriptionHandler Creates a description from a form using "imageName", "description", "exampleCommand". */
+// CreateDescriptionHandler Creates a description from a form using "imageName", "description", "exampleCommand".
 func (context *HandlerContext) CreateDescriptionHandler(w http.ResponseWriter, r *http.Request) {
 	if !checkForPostWithError(w, r) {
 		return
@@ -114,7 +114,7 @@ func (context *HandlerContext) CreateDescriptionHandler(w http.ResponseWriter, r
 	context.RootRedirectHandler(w, r)
 }
 
-/*AddCategoryToDescriptionHandler Adds a category to a descriptio from a POST using "category" and "image". */
+// AddCategoryToDescriptionHandler Adds a category to a descriptio from a POST using "category" and "image".
 func (context *HandlerContext) AddCategoryToDescriptionHandler(w http.ResponseWriter, r *http.Request) {
 	if !checkForPostWithError(w, r) {
 		return
@@ -133,7 +133,7 @@ func (context *HandlerContext) AddCategoryToDescriptionHandler(w http.ResponseWr
 	context.RootRedirectHandler(w, r)
 }
 
-/*RemoveCategoryFromDescriptionHandler Removes a category from a descriptio from a POST using "category" and "image". */
+// RemoveCategoryFromDescriptionHandler Removes a category from a description from a POST using "category" and "image".
 func (context *HandlerContext) RemoveCategoryFromDescriptionHandler(w http.ResponseWriter, r *http.Request) {
 	if !checkForPostWithError(w, r) {
 		return
@@ -152,7 +152,21 @@ func (context *HandlerContext) RemoveCategoryFromDescriptionHandler(w http.Respo
 	context.RootRedirectHandler(w, r)
 }
 
-/*RootRedirectHandler Redirects to the index page. */
+// EditHelloHandler Edit the hello message from a POST using "hello".
+func (context *HandlerContext) EditHelloHandler(w http.ResponseWriter, r *http.Request) {
+	if !checkForPostWithError(w, r) {
+		return
+	}
+	r.ParseForm()
+	hello := r.PostFormValue("hello")
+	if len(hello) > 0 {
+		context.cache.Flush()
+		context.db.CreateAndPersistOrUpdateHelloMessage(hello)
+	}
+	context.RootRedirectHandler(w, r)
+}
+
+// RootRedirectHandler Redirects to the index page.
 func (context *HandlerContext) RootRedirectHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, context.settings.ContextRoot+"/", 302)
 }

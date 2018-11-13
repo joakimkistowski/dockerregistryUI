@@ -13,21 +13,19 @@ const catalogURI string = "v2/_catalog"
 const tagsListURIPrefix string = "v2/"
 const tagsListURISuffix string = "/tags/list"
 
-/*RegistryImage Image, as described by the registry. */
+// RegistryImage Image, as described by the registry.
 type RegistryImage struct {
-	/*ImageName The image's name. */
 	ImageName string
-	/*ImageTags The image's tags. */
 	ImageTags []string
 }
 
-/*DockerImageMetaData Interface for meta-data on Docker images with a name and tags. */
+// DockerImageMetaData Interface for meta-data on Docker images with a name and tags.
 type DockerImageMetaData interface {
 	GetImageName() string
 	GetImageTags() []string
 }
 
-/*RegistryHTTPClient An HTTP client that handles communication with the registry. */
+// RegistryHTTPClient An HTTP client that handles communication with the registry.
 type RegistryHTTPClient struct {
 	initialized bool
 	settings    DockerRegistryUISettings
@@ -41,7 +39,7 @@ type tagList struct {
 	Tags []string `json:"tags"`
 }
 
-/*NewRegistryHTTPClient Initializes a new HTTP client for communication with the Docker registry. */
+// NewRegistryHTTPClient Initializes a new HTTP client for communication with the Docker registry.
 func NewRegistryHTTPClient(settings DockerRegistryUISettings) *RegistryHTTPClient {
 	if settings.IgnoreInsecureHTTPS {
 		http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
@@ -49,21 +47,21 @@ func NewRegistryHTTPClient(settings DockerRegistryUISettings) *RegistryHTTPClien
 	return &RegistryHTTPClient{initialized: true, settings: settings}
 }
 
-/*RetreiveRegistryImages Retreives image infos from the registry. */
+// RetreiveRegistryImages Retreives image infos from the registry.
 func (client *RegistryHTTPClient) RetreiveRegistryImages() []RegistryImage {
 	imageInfos, _ := client.CheckUpToDateOrRetreiveRegistryImages(nil)
 	return imageInfos
 }
 
-/*CheckUpToDateOrRetreiveRegistryImages Checks if the provided images are still up-to-date.
- * Returns an empty image list and "true" if they are. Returns a more up-to-date list and "false" otherwise.
- * The original list is never modified. */
+// CheckUpToDateOrRetreiveRegistryImages Checks if the provided images are still up-to-date.
+// Returns an empty image list and "true" if they are. Returns a more up-to-date list and "false" otherwise.
+// The original list is never modified.
 func (client *RegistryHTTPClient) CheckUpToDateOrRetreiveRegistryImages(
 	imagesToCheck []DockerImageMetaData) ([]RegistryImage, bool) {
 	if !client.initialized {
 		return []RegistryImage{}, false
 	}
-	//get images from registry
+	// get images from registry
 	response, err := getResponse(client.settings, catalogURI)
 	if err != nil {
 		return []RegistryImage{}, false
@@ -73,9 +71,9 @@ func (client *RegistryHTTPClient) CheckUpToDateOrRetreiveRegistryImages(
 	if err != nil {
 		return []RegistryImage{}, false
 	}
-	//check if the image count has changed
+	// check if the image count has changed
 	registryUpToDate := imagesToCheck != nil && (len(rlist.Repositories) == len(imagesToCheck))
-	//get tags from registry
+	// get tags from registry
 	var imageInfos []RegistryImage
 	for _, image := range rlist.Repositories {
 		var imageInfo RegistryImage
@@ -94,7 +92,7 @@ func (client *RegistryHTTPClient) CheckUpToDateOrRetreiveRegistryImages(
 		}
 		imageInfos = append(imageInfos, imageInfo)
 	}
-	//return if up-to-date version on image count mismatch, or check if the tag counts per image have changed
+	// return if up-to-date version on image count mismatch, or check if the tag counts per image have changed
 	if !registryUpToDate {
 		return imageInfos, false
 	} else {
@@ -122,9 +120,6 @@ func getResponse(settings DockerRegistryUISettings, uri string) (*http.Response,
 
 func unmarshalJSON(response *http.Response, v interface{}) error {
 	defer response.Body.Close()
-	/*bodyBytes, _ := ioutil.ReadAll(response.Body)
-	bodyString := string(bodyBytes)
-	log.Println(bodyString)*/
 	err := json.NewDecoder(response.Body).Decode(v)
 	if err != nil {
 		log.Printf("Could not get decode response from Registry; error: %s\n", err)
@@ -133,12 +128,12 @@ func unmarshalJSON(response *http.Response, v interface{}) error {
 	return nil
 }
 
-/*GetImageName Get the image name. */
+// GetImageName Get the image name.
 func (image *RegistryImage) GetImageName() string {
 	return image.ImageName
 }
 
-/*GetImageTags Get the image tags. */
+// GetImageTags Get the image tags.
 func (image *RegistryImage) GetImageTags() []string {
 	return image.ImageTags
 }

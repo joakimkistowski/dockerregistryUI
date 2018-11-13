@@ -102,10 +102,14 @@ func RefreshUITemplateDataIfNecessary(settings utils.DockerRegistryUISettings,
 func createUITemplateDataWithRegistryImages(settings utils.DockerRegistryUISettings,
 	handle *persistence.DBHandle, registryImages []utils.RegistryImage) *UITemplateData {
 	data := UITemplateData{
-		Settings:         settings,
-		HelloMessage:     "This is a Hello message with some usful information for your users.",
+		Settings: settings,
+		HelloMessage: "Welcome to the **DockerRegistry UI**. " +
+			"Check out the documentation at: https://github.com/joakimkistowski/dockerregistryUI/",
 		Categories:       handle.FindAllImageCategories(),
 		filterCategoryID: 0,
+	}
+	if hello, notFound := handle.FindHelloMessage(); notFound == nil {
+		data.HelloMessage = hello
 	}
 	unsafeFormattedHello := []byte(markdownRenderer.RenderToString([]byte(data.HelloMessage)))
 	data.FormattedHelloMessage = template.HTML(bluemonday.UGCPolicy().SanitizeBytes(unsafeFormattedHello))

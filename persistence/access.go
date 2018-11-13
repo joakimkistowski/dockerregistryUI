@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-/*CreateAndPersistImageCategory Creates a new image category and persists it. */
+// CreateAndPersistImageCategory Creates a new image category and persists it.
 func (handle *DBHandle) CreateAndPersistImageCategory(name string, color string) *ImageCategory {
 	category := ImageCategory{Name: name}
 	if len(color) == 0 || !strings.HasPrefix(color, "#") {
@@ -18,7 +18,7 @@ func (handle *DBHandle) CreateAndPersistImageCategory(name string, color string)
 	return &category
 }
 
-/*CreateAndPersistOrUpdateImageDescription Creates an image description or updates one if one with the name exists. */
+// CreateAndPersistOrUpdateImageDescription Creates an image description or updates one if one with the name exists.
 func (handle *DBHandle) CreateAndPersistOrUpdateImageDescription(
 	name string, description string, exampleCommand string) *ImageDescription {
 	imageDescription := ImageDescription{ImageName: name, Description: description, ExampleCommand: exampleCommand}
@@ -34,21 +34,21 @@ func (handle *DBHandle) CreateAndPersistOrUpdateImageDescription(
 	return &imageDescription
 }
 
-/*FindImageDescriptionByName Find an image description using its name. */
+// FindImageDescriptionByName Find an image description using its name.
 func (handle *DBHandle) FindImageDescriptionByName(name string) (*ImageDescription, error) {
 	imageDescription := ImageDescription{}
 	retreived, err := handle.retreiveWithAttribute("image_name", name, &imageDescription, "Categories")
 	return retreived.(*ImageDescription), err
 }
 
-/*FindImageDescriptionByID Find an image description using its ID. */
+// FindImageDescriptionByID Find an image description using its ID.
 func (handle *DBHandle) FindImageDescriptionByID(id uint) (*ImageDescription, error) {
 	imageDescription := ImageDescription{}
 	retreived, err := handle.retreiveWithAttribute("id", id, &imageDescription, "Categories")
 	return retreived.(*ImageDescription), err
 }
 
-/*FindImageCategoryByID Find an image category using its ID. */
+// FindImageCategoryByID Find an image category using its ID.
 func (handle *DBHandle) FindImageCategoryByID(id uint) (*ImageCategory, error) {
 	category := ImageCategory{}
 	retreived, err := handle.retreiveWithAttribute("id", id, &category, "Descriptions")
@@ -69,19 +69,19 @@ func (handle *DBHandle) retreiveWithAttribute(
 	return entity, nil
 }
 
-/*FindAllImageCategories Finds and returns all image categories. */
+// FindAllImageCategories Finds and returns all image categories.
 func (handle *DBHandle) FindAllImageCategories() []ImageCategory {
 	var imageCategories []ImageCategory
 	handle.db.Find(&imageCategories)
 	return imageCategories
 }
 
-/*DeleteImageDescription Deletes an image description if it exists. */
+// DeleteImageDescription Deletes an image description if it exists.
 func (handle *DBHandle) DeleteImageDescription(id uint) bool {
 	return handle.deleteWithID(id, ImageDescription{})
 }
 
-/*DeleteImageCategory Deletes an image description if it exists. */
+// DeleteImageCategory Deletes an image description if it exists.
 func (handle *DBHandle) DeleteImageCategory(id uint) bool {
 	return handle.deleteWithID(id, ImageCategory{})
 }
@@ -94,7 +94,7 @@ func (handle *DBHandle) deleteWithID(id uint, placeholder interface{}) bool {
 	return false
 }
 
-/*AddImageCategoryToImageDescription Adds the image category to the image description. */
+// AddImageCategoryToImageDescription Adds the image category to the image description.
 func (handle *DBHandle) AddImageCategoryToImageDescription(categoryID uint, descriptionID uint) {
 	imageDescription := ImageDescription{}
 	imageCategory := ImageCategory{}
@@ -110,7 +110,7 @@ func (handle *DBHandle) AddImageCategoryToImageDescription(categoryID uint, desc
 	tx.Commit()
 }
 
-/*RemoveImageCategoryFromImageDescription Removes the image category from the image description. */
+// RemoveImageCategoryFromImageDescription Removes the image category from the image description.
 func (handle *DBHandle) RemoveImageCategoryFromImageDescription(categoryID uint, descriptionID uint) {
 	imageDescription := ImageDescription{}
 	imageCategory := ImageCategory{}
@@ -124,4 +124,27 @@ func (handle *DBHandle) RemoveImageCategoryFromImageDescription(categoryID uint,
 		}
 	}
 	tx.Commit()
+}
+
+//CreateAndPersistOrUpdateHelloMessage Creates a hello message or updates it.
+func (handle *DBHandle) CreateAndPersistOrUpdateHelloMessage(
+	message string) {
+	helloMessage := HelloMessage{Message: message}
+	tx := handle.db.Begin()
+	if tx.First(&helloMessage).RecordNotFound() {
+		tx.Create(&helloMessage)
+	} else {
+		helloMessage.Message = message
+		tx.Save(&helloMessage)
+	}
+	tx.Commit()
+}
+
+// FindHelloMessage Find the stored hello Message.
+func (handle *DBHandle) FindHelloMessage() (string, error) {
+	helloMessage := HelloMessage{}
+	if handle.db.First(&helloMessage).RecordNotFound() {
+		return "", errors.New("Entity not found")
+	}
+	return helloMessage.Message, nil
 }
