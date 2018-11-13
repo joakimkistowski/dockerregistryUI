@@ -12,8 +12,6 @@ Designed with a focus on internal and development registries that require freque
 
 ## Getting Started
 
-**Please note that the setup is currently not working, as the UI is not on DockerHub yet**
-
 Running the registry UI is as simple as executing the following Docker command line (change `/my/persistent/path` to a path on your machine and `myregistry.com` to the host name of your Docker registry):
 
 ```bash
@@ -34,3 +32,7 @@ In general, you can configure the registry UI using environment variables. The f
 ## Accessing the UI
 
 The UI can be accessed at http://yourmachine:8080/ (assuming you exposed it at port 8080). Accessing it at this root path will immediatly redirect you to http://yourmachine:8080/ui/ . Note that the `/ui` path and all nested sub-paths do not collide with the Docker registry API. As a result, your proxy could expose both the UI and the registry itself using the same host name.
+
+## Securing the UI
+
+The recommended way of securing the UI is by adding authentication to your proxy. You can add read/write authentication by allowing all read users to access `/ui/` and only allowing write users to `/ui/write/*`.
