@@ -39,6 +39,9 @@ func (context *HandlerContext) IndexHandler(w http.ResponseWriter, r *http.Reque
 	if templateData, hasCache = context.cache.GetCached(); !hasCache {
 		templateData = InitializeUITemplateData(context.settings, context.db, context.client)
 		context.cache.Cache(templateData)
+	} else if up := RefreshUITemplateDataIfNecessary(context.settings, context.db, context.client, &templateData); up {
+		context.cache.Flush()
+		context.cache.Cache(templateData)
 	}
 	categoryQuery := r.URL.Query().Get("category")
 	if categoryID, err := strconv.ParseUint(categoryQuery, 10, 64); err == nil {

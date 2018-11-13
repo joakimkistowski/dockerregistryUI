@@ -21,6 +21,12 @@ type RegistryImage struct {
 	ImageTags []string
 }
 
+/*DockerImageMetaData Interface for meta-data on Docker images with a name and tags. */
+type DockerImageMetaData interface {
+	GetImageName() string
+	GetImageTags() []string
+}
+
 /*RegistryHTTPClient An HTTP client that handles communication with the registry. */
 type RegistryHTTPClient struct {
 	initialized bool
@@ -45,37 +51,61 @@ func NewRegistryHTTPClient(settings DockerRegistryUISettings) *RegistryHTTPClien
 
 /*RetreiveRegistryImages Retreives image infos from the registry. */
 func (client *RegistryHTTPClient) RetreiveRegistryImages() []RegistryImage {
+	imageInfos, _ := client.CheckUpToDateOrRetreiveRegistryImages(nil)
+	return imageInfos
+}
+
+/*CheckUpToDateOrRetreiveRegistryImages Checks if the provided images are still up-to-date.
+ * Returns an empty image list and "true" if they are. Returns a more up-to-date list and "false" otherwise.
+ * The original list is never modified. */
+func (client *RegistryHTTPClient) CheckUpToDateOrRetreiveRegistryImages(
+	imagesToCheck []DockerImageMetaData) ([]RegistryImage, bool) {
 	if !client.initialized {
-		return []RegistryImage{}
+		return []RegistryImage{}, false
 	}
+	//get images from registry
 	response, err := getResponse(client.settings, catalogURI)
 	if err != nil {
-		return []RegistryImage{}
+		return []RegistryImage{}, false
 	}
 	var rlist repositoryList
 	err = unmarshalJSON(response, &rlist)
 	if err != nil {
-		return []RegistryImage{}
+		return []RegistryImage{}, false
 	}
+	//check if the image count has changed
+	registryUpToDate := imagesToCheck != nil && (len(rlist.Repositories) == len(imagesToCheck))
+	//get tags from registry
 	var imageInfos []RegistryImage
 	for _, image := range rlist.Repositories {
 		var imageInfo RegistryImage
 		imageInfo.ImageName = image
 		response, err = getResponse(client.settings, tagsListURIPrefix+image+tagsListURISuffix)
 		if err != nil {
-			return []RegistryImage{}
+			return []RegistryImage{}, false
 		}
 		var tlist tagList
 		err = unmarshalJSON(response, &tlist)
 		if err != nil {
-			return []RegistryImage{}
+			return []RegistryImage{}, false
 		}
 		for _, tag := range tlist.Tags {
 			imageInfo.ImageTags = append(imageInfo.ImageTags, tag)
 		}
 		imageInfos = append(imageInfos, imageInfo)
 	}
-	return imageInfos
+	//return if up-to-date version on image count mismatch, or check if the tag counts per image have changed
+	if !registryUpToDate {
+		return imageInfos, false
+	} else {
+		for i, retreivedImage := range imageInfos {
+			if len(retreivedImage.ImageTags) != len(imagesToCheck[i].GetImageTags()) ||
+				retreivedImage.ImageName != imagesToCheck[i].GetImageName() {
+				return imageInfos, false
+			}
+		}
+	}
+	return []RegistryImage{}, true
 }
 
 func getResponse(settings DockerRegistryUISettings, uri string) (*http.Response, error) {
@@ -101,4 +131,14 @@ func unmarshalJSON(response *http.Response, v interface{}) error {
 		return err
 	}
 	return nil
+}
+
+/*GetImageName Get the image name. */
+func (image *RegistryImage) GetImageName() string {
+	return image.ImageName
+}
+
+/*GetImageTags Get the image tags. */
+func (image *RegistryImage) GetImageTags() []string {
+	return image.ImageTags
 }
