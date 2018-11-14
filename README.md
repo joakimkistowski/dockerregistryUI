@@ -29,6 +29,8 @@ In general, you can configure the registry UI using environment variables. The f
 * `REGISTRY_BASIC_AUTH_USER` : User to access registries protected with basic authentication.
 * `REGISTRY_BASIC_AUTH_PASSWORD` : Password to access registries protected with basic authentication.
 
+Some more examples using the environment variables for different setups can be found in the [deployment examples](#deployment-examples).
+
 ## Accessing the UI
 
 The UI can be accessed at http://yourmachine:8080/ (assuming you exposed it at port 8080). Accessing it at this root path will immediatly redirect you to http://yourmachine:8080/ui/ . Note that the `/ui` path and all nested sub-paths do not collide with the Docker registry API. As a result, your proxy could expose both the UI and the registry itself using the same host name.
