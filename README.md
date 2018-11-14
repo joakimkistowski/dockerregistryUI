@@ -36,3 +36,93 @@ The UI can be accessed at http://yourmachine:8080/ (assuming you exposed it at p
 ## Securing the UI
 
 The recommended way of securing the UI is by adding authentication to your proxy. You can add read/write authentication by allowing all read users to access `/ui/` and only allowing write users to `/ui/write/*`.
+
+The following partial example uses a registry protected by an nginx proxy, configured as [described in the Docker documentation](https://docs.docker.com/registry/recipes/nginx/#setting-things-up). We edit the `location` element of the example configuration:
+
+```nginx
+location / {
+    # Assumes the the htpasswd file exists and has at least one valid user
+    auth_basic "Registry realm";
+    auth_basic_user_file /etc/nginx/conf.d/nginx.htpasswd;
+
+    # The proxy headers specified in the Docker documentation
+    # (see https://docs.docker.com/registry/recipes/nginx/#setting-things-up)
+    proxy_set_header  Host              $http_host;
+    proxy_set_header  X-Real-IP         $remote_addr;
+    proxy_set_header  X-Forwarded-For   $proxy_add_x_forwarded_for;
+    proxy_set_header  X-Forwarded-Proto $scheme;
+    proxy_read_timeout                  900;
+
+    # Pass everything not in the /v2/ location to the UI
+    proxy_pass http://<ui-host>:<ui-port>;
+
+    # Proxy the Docker registry API to the actual registry
+    location /v2/ {
+      # You may want to catch old Docker Versions (omitted, see the linked Docker documentation)
+
+      # Add $docker_distribution_api_version, as in Docker documentation nginx receipe
+      add_header 'Docker-Distribution-Api-Version' $docker_distribution_api_version always;
+
+      # disable limits to avoid HTTP 413 for large image uploads
+      client_max_body_size 0;
+
+      # proxy the /v2/ location to the registry, proxy settings were already set for parent location
+      proxy_pass  http://<registry-host>:<registry-port>;
+    }
+
+    # Optional: restrict write access to the UI by restricting POST or the following location:
+    location /ui/write/ {
+        # some additional restrictions or htpasswd
+    }
+}
+
+```
+
+## Deployment Examples
+
+Following, a few example deployments of the UI with a Docker registry.
+
+### UI with access to Registry using linked Containers
+
+In this example, the Registry and UI are expected to be secured usig some front-end proxy. However, the UI accesses the registry directly through Docker. This way, it doesn't need any authorization credentials or HTTPS shenanigans.
+
+The example uses Docker-compose. A similar effect can be achieved by co-locating both images in a Pod in Kubernetes.
+
+```yaml
+version: "2"
+services:
+  registry:
+    image: registry:2
+    restart: always
+    environment:
+      <optional environemnt variables>
+    volumes:
+      - </your/registry/volume>:/var/lib/registry
+    ports:
+      - 5000:5000
+  registry-ui:
+    image: descartesresearch/dockerregistryui
+    restart: always
+    environment:
+      - REGISTRY_HOST=<your.public.host>
+      - REGISTRY_URL=http://registry:5000/
+    volumes:
+      - </your/registry-ui/volume>:/data
+    links:
+      - registry
+    ports:
+      - 8080:8080
+```
+
+### UI with access to public Registry with Basic Authentication
+
+In this example, the UI accesses the Registry using its public host-name. The registry is secured using basic authentication.
+
+```bash
+$ docker run -d --restart=always --name registry-ui \
+    -v </your/registry-ui/volume>:/data -p 8080:8080 \
+    -e REGISTRY_HOST=<your.public.host> \
+    -e REGISTRY_BASIC_AUTH_USER=<registry-username> \
+    -e REGISTRY_BASIC_AUTH_PASSWORD=<registry-password> \
+    descartesresearch/dockerregistryui
+```
