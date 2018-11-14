@@ -1,6 +1,6 @@
 # Docker Registry UI
 
-UI for private Docker registries. Shows images and tags in of all images in the registry. Displays user-provided image descriptions and run documentation. Is deliberatly kept light on features to be simple to setup, run, and maintain.
+UI for private Docker registries. Shows images and tags of all images in the registry. Displays user-provided image descriptions and run documentation. Is deliberatly kept light on features to be simple to setup, run, and maintain.
 Designed with a focus on internal and development registries that require frequent updates to images and image documentation.
 
 ## Features
