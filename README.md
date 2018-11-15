@@ -84,11 +84,11 @@ location / {
 
 Following, a few example deployments of the UI with a Docker registry.
 
-### UI with access to Registry using linked Containers
+### UI with access to Registry using linked Containers with Docker-Compose
 
 In this example, the Registry and UI are expected to be secured usig some front-end proxy. However, the UI accesses the registry directly through Docker. This way, it doesn't need any authorization credentials or HTTPS shenanigans.
 
-The example uses Docker-compose. A similar effect can be achieved by co-locating both images in a Pod in Kubernetes.
+The example uses Docker-compose. A similar example using Kubernetes can be found below.
 
 ```yaml
 version: "2"
@@ -114,6 +114,58 @@ services:
       - registry
     ports:
       - 8080:8080
+```
+
+### UI with access to Registry in Kubernetes Pod
+
+In this example, the Registry and UI are co-located on the same pod in a Kubernetes cluster. can be achieved by co-locating both images in a Pod in Kubernetes. The example publishes the Registry and UI using a `NodePort` example service to ports 30050 and 30080. In production, you would probably use an ingress instead. This example also doesn't consider authentication.
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: registry
+  labels:
+    run: registry
+spec:
+  containers:
+  - name: registry
+    image: registry:2
+    ports:
+    - containerPort: 5000
+    # Don't forget to mount /var/lib/registry to one of your volumes
+  - name: registry-ui
+    image: descartesresearch/dockerregistryui
+    ports:
+    - containerPort: 8080
+    env:
+    - name: REGISTRY_HOST
+      value: "myregistry.com"
+    - name: REGISTRY_URL
+      value: "http://localhost:5000/"
+    # Don't forget to mount /data to one of your volumes
+---
+# Example service using node port. You should probably use an ingress (facilitating authentication) instead.
+apiVersion: v1
+kind: Service
+metadata:
+  name: registry-ui
+  labels:
+    run: registry
+spec:
+  type: NodePort
+  ports:
+  - port: 5000
+    name: registry-port
+    nodePort: 30050
+    protocol: TCP
+  - port: 8080
+    name: registry-ui-port
+    nodePort: 30080
+    protocol: TCP
+  selector:
+    run: registry
+
 ```
 
 ### UI with access to public Registry with Basic Authentication
