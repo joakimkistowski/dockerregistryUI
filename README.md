@@ -118,7 +118,7 @@ services:
 
 ### UI with access to Registry in Kubernetes Pod
 
-In this example, the Registry and UI are co-located on the same pod in a Kubernetes cluster. can be achieved by co-locating both images in a Pod in Kubernetes. The example publishes the Registry and UI using a `NodePort` example service to ports 30050 and 30080. In production, you would probably use an ingress instead. This example also doesn't consider authentication.
+In this example, the Registry and UI are co-located on the same pod in a Kubernetes cluster. The UI uses the local network within the pod to access the registry. The example then publishes the Registry and UI using a `NodePort` example service to ports 30050 and 30080. In production, you would probably use an ingress instead. This example also doesn't consider authentication.
 
 ```yaml
 apiVersion: v1
