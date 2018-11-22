@@ -93,7 +93,7 @@ func RefreshUITemplateDataIfNecessary(settings utils.DockerRegistryUISettings,
 		imageMetaData = append(imageMetaData, &image)
 	}
 	if newerRegistryImages, useOldData := client.CheckUpToDateOrRetreiveRegistryImages(imageMetaData); !useOldData {
-		data = createUITemplateDataWithRegistryImages(settings, handle, newerRegistryImages)
+		(*data) = (*createUITemplateDataWithRegistryImages(settings, handle, newerRegistryImages))
 		return true
 	}
 	return false
