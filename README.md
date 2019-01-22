@@ -116,6 +116,10 @@ services:
       - 8080:8080
 ```
 
+**Note**:
+1. You may have to replace `links:` with `depends_on:` when running in Docker Swarm.
+1. NFS may cause trouble with the UI volume. If you use an NFS volume mount it using the `nolock` option.
+
 ### UI with access to Registry in Kubernetes Pod
 
 In this example, the Registry and UI are co-located on the same pod in a Kubernetes cluster. The UI uses the local network within the pod to access the registry. The example then publishes the Registry and UI using a `NodePort` example service to ports 30050 and 30080. In production, you would probably use an ingress instead. This example also doesn't consider authentication.
