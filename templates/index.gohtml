@@ -61,7 +61,7 @@
 							<td>{{.FormattedTags}}</td>
 							<td>{{.FormattedDescription}}</td>
 							<td class="col-md-6"><code>{{.FormattedExampleCommand}}</code></td>
-							<td><button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#{{.Name}}modal"><span class="glyphicon glyphicon-pencil"></span></button></td>
+							<td><button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#{{.NameB64}}modal"><span class="glyphicon glyphicon-pencil"></span></button></td>
 						</tr>
 						{{- end -}}
 						{{- end}}
@@ -70,7 +70,7 @@
 					{{- /* Image description edit modals. */ -}}
 					{{range .Images -}}
 					{{- if $.ImageMatchesCurrentFilter . -}}
-					<div id="{{.Name}}modal" class="modal fade" role="dialog">
+					<div id="{{.NameB64}}modal" class="modal fade" role="dialog">
 						<div class="modal-dialog">
 							<div class="modal-content">
 								<div class="modal-header">

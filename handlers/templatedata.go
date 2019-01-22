@@ -3,6 +3,7 @@ package handlers
 import (
 	"dockerregistryUI/persistence"
 	"dockerregistryUI/utils"
+	"encoding/base64"
 	"html"
 	"html/template"
 	"regexp"
@@ -29,6 +30,7 @@ type UITemplateData struct {
 // ImageData Data about an image, collected from registry and database.
 type ImageData struct {
 	Name                    string
+	NameB64                 string
 	Tags                    []string
 	FormattedTags           string
 	FormattedDescription    template.HTML
@@ -55,6 +57,7 @@ type inMemoryUITemplateCache struct {
 func MergeAndFormatImageData(image utils.RegistryImage, description *persistence.ImageDescription) ImageData {
 	var data ImageData
 	data.Name = image.ImageName
+	data.NameB64 = base64.RawURLEncoding.EncodeToString([]byte(image.ImageName))
 	data.Tags = image.ImageTags
 	data.FormattedTags = formatTags(data.Tags)
 	data.Description = description
