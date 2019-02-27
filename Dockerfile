@@ -20,6 +20,7 @@ COPY ./static /opt/dockerregistryUI/static
 
 FROM alpine
 # Execution Container
+RUN apk add --no-cache ca-certificates openssl
 COPY --from=0 /opt/dockerregistryUI /opt/dockerregistryui
 COPY --from=0 /go/src/dockerregistryUI/dockerregistryUI /opt/dockerregistryui/dockerregistryui
 
